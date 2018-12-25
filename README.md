@@ -1,25 +1,27 @@
   
   
   
-  
-  
-  
-  
-* [『データ解析のための統計モデリング入門』 - aviatesk](#データ解析のための統計モデリング入門-aviatesk )
-	* [Tasks](#tasks )
-	* [Author](#author )
-	* [References](#references )
-  
-  
-  
-  
-  
 # 『データ解析のための統計モデリング入門』 - aviatesk
   
   
 [久保拓弥『データ解析のための統計モデリング入門: 一般化線形モデル・階層ベイズモデル・MCMC』][kubopage]を勉強したときの, 自分の理解と実際のコードのノートを, [R-markdown][R-markdown]を用いて全ての画像を埋め込んだHTLMファイルに出力してまとめています.
   
 [全てのデータ][data]および[ノート][notes]に含まれるコードの大部分は, [久保さんのwebページ][kubopage]で公開されているものによります.
+  
+  
+## TOC
+  
+  
+  
+  
+  
+* [Tasks](#tasks )
+* [Author](#author )
+* [References](#references )
+  
+  
+  
+  
   
   
 ## Tasks

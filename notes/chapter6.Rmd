@@ -1,0 +1,620 @@
+---
+title: chapter6 ― GLMの応用範囲を広げる
+subtitle: ロジスティック回帰など
+author: KADOWAKI, Shuhei
+date: 2018/12/21
+output:
+    html_document:
+        toc: true
+        toc_float: true
+        number_sections: true
+        theme: cosmo
+        code_folding: show
+        df_print: paged        
+---
+
+```{r echo=FALSE}
+## Setting the global code chunk options ##
+# Args
+#   comment='': won't append any string to the start of each line of results
+#   fig.align='center': align figures to the center of document
+knitr::opts_chunk$set(comment="", fig.align="center")
+```
+
+
+
+
+# GLMの汎用性
+
+`glm`系関数でよく使われる確率分布と, よく使われるリンク関数
+
+ 確率分布 | 乱数生成 | `glm.family` | `link`
+--|---|---|--
+ 二項分布 | `rbinom`  | `binomial`  |  `logit`
+ ポアソン分布 | `rpois`  | `poisson`  |  `log`
+ 負の二項分布 | `rnbinom`  | `glm.nb`  |  `log`
+ 正規分布 | `rnorm`  | `gaussian`  |  `identity`
+ ガンマ分布 | `rgamma`  | `gamma`  |  `log`
+
+
+
+# 二項分布を使ったGLM
+
+
+## 二項分布(binomial distribution)
+
+- 上限のあるカウントデータを表すことができる
+    - e.g.) 「$N$ 個体の実験対象に同じ処理をしたら, $y$ 個体で反応が陽性, $N-y$ 個体では陰性だった」
+    - c.f.) ポアソン分布: 上限のないカウントデータ
+- 確率分布: $p(y | N, q) = \Biggl( \begin{matrix}N\\ y\end{matrix} \Biggr) q^y (1 - q)^{N - y}$
+    - 「$N$ 個中の $y$ 個で事象が生起する」という確率を表す
+
+$N = 8$ の時の確率分布を図示すると以下のよう.
+
+```{r}
+y <- 0:8
+p <- dbinom(y, max(y), prob = 0.1)
+plot(y, p, type = "n", xlab = "y", ylab = "p(y |8, q)")
+for (q in c(0.1, 0.3, 0.8)) {
+    p <- dbinom(y, max(y), prob = q)
+	lines(y, p, type = "b", col = rgb(0, 0, 0, min(q + 0.3, 1)), lwd = 2, pch = 16)
+}
+legend("topright", legend = c(0.1, 0.3, 0.6), pch = c(21, 23, 24), title = "q")
+```
+
+
+## (線形)ロジスティック回帰
+
+- **ロジスティック回帰(logistic regression)**: 確率分布に二項分布, リンク関数にロジットリンク関数(logit link function)を使用するGLM
+    - リンク関数には, profitリンク関数や, complementary log-logリンク関数なども使われる
+
+### ロジットリンク関数とロジスティック関数
+
+- **ロジットリンク関数(logit link function)**: 二項分布のパラメータ $q_{i}$ の制約 $0 \leq q_{i} \leq 1$ と線形予測子をうまく結びつけるリンク関数
+- **ロジスティック関数(logistic function)**: ロジット(リンク)関数の逆関数
+$$
+    q_{i} = {\rm logistic} (z_{i}) = \frac{1}{1 + \exp(-z_{i})} \\
+    z_{i} = \beta_{1} + \beta_{2} x_{i} + ..
+$$
+
+ロジスティック関数を図示すると以下のよう.
+
+```{r}
+logistic <- function(z) 1 / (1 + exp(-z))
+z <- seq(-5, 5, 0.1)
+plot(z, logistic(z), type = "l", xlab = "z", ylab = "q")
+abline(v = 0, lty = 2)
+```
+
+$z_{i}$ がどのような値でも, 必ず, $0 \leq q_{i} \leq 1$ となる.
+
+次に, $q_{i}$ が $x_{i}$ だけに依存していると仮定( $z_{i} = \beta_{1} + \beta_{2} x_{i}$ )して, ロジスティック関数と線形予測子の関係を図示すると以下のよう.
+
+```{r fig.show='hold', out.width='50%', out.height='100%', fig.align='default'}
+xx <- seq(-3, 3, 0.1)
+cols <- c("#118ab6", "#212198", "#af13a4")
+ 
+# left
+plot(xx, logistic(0 + 2 * xx), type = "l", lwd = 2, col = cols[1], ylim = c(0, 1), yaxs = "i", xlab = "x", ylab = "q", main = "beta_2 = 2")
+lines(xx, logistic(2 + 2 * xx), lwd = 2, col = cols[2])
+lines(xx, logistic(-3 + 2 * xx), lwd = 2, col = cols[3])
+legend("topleft", legend = c(0, 2, -3), col = cols, lwd = 2, title = "beta_1")
+ 
+# right
+plot(xx, logistic(0 + 2 * xx), type = "l", lwd = 2, col = cols[1], ylim = c(0, 1), yaxs = "i", xlab = "x", ylab = "q", main = "beta_1 = 0")
+lines(xx, logistic(0 + 4 * xx), lwd = 2, col = cols[2])
+lines(xx, logistic(0 - 1 * xx), lwd = 2, col = cols[3])
+legend("left", legend = c(2, 4, -1), col = cols, lwd = 2, title = "beta_1")
+```
+
+このロジスティック関数を以下のように変形したとき, 左辺がロジット(リンク)関数, 右辺が線形予測子.
+
+$$
+    \log \frac{q_{i}}{1 - q_{i}} = z_{i} \\
+    {\rm logit}(q_{i}) = \log \frac{q_{i}}{1 - q_{i}}\\
+    z_{i} = \beta_{1} + \beta_{2} x_{i} + ...
+$$
+
+### パラメータ推定
+
+尤度関数と対数尤度関数は以下のようになる.
+
+$$
+    L({\beta_{j}}) = \prod_{i} \Biggl( \begin{matrix}N_{i} \\ y_{i} \end{matrix} \Biggr) q_{i}^{y_{i}} (1 - q_{i})^{N_{i} - y_{i}} \\
+    \log L({\beta_{j}}) = \sum_{i} \Biggl\{ \log \Biggl( \begin{matrix}N_{i} \\ y_{i} \end{matrix} \Biggr) + y_{i} \log q_{i} + (N_{i} - y_{i}) \log (1 - q_{i}) \Biggr\} \\
+    q_{i} = f(\{\beta_{1}, \beta_{2}, ...\})
+$$
+
+この $\log L$ を最大化する $\{{\hat \beta_{j}}\}$ はRの `glm` がやってくれる.
+
+
+***
+**Example data**
+
+今回使うデータは次のようなもの.
+
+- ある植物個体 $i$ について,
+    - $N_{i}$: 観察種子数
+    - $y_{i}$: 生存種子数
+        - $q_{i}$: 「$i$から得られた1個の種子が生きている確率」
+        - 今回は $N_{i}$ は常に8なので, $y_{i}$ の増加 = $q_{i}$ の増加
+    - $x_{i}$: 体サイズ
+    - $f_{i}$: 施肥処理の有無
+
+```{r}
+d <- read.csv("../data/data6a.csv")
+summary(d)
+ 
+plot.data <- function(...) {
+	plot(
+		d$x, d$y,
+		pch = c(21, 16)[d$f],
+		xlab = "x", ylab = "y",
+		...
+	)
+}
+ 
+plot.data()
+legend("topleft", legend = c("C", "T"), pch = c(21, 19))
+```
+
+- $x_{i}$ が大きくなると, $y_{i}$ も大きくなる
+- $f_{i}$ =`T` で $y_{i}$ が増加
+
+
+***
+
+
+`glm`でのロジスティック回帰は次のように行う.
+
+- 応答変数: `cbind(y, N - y)`: (生存した種子数, 死んだ種子数)の行列を生成
+    - `y`が「生存した(`0`)」「死んだ(`1`)」のような2値分類を取るときは, `glm(y ~ x, ...)` とできる
+- `family = binomial` とすると, デフォルトでリンク関数が, `binomial(link = "logit")` となる
+
+```{r}
+fit.xf <- glm(cbind(y, N - y) ~ x + f, data = d, family = binomial)
+print(fit.xf)
+```
+
+予測された切片 $\{{\hat \beta_{1}}, {\hat \beta_{2}}, {\hat \beta_{3 }}\}$ = $\{-19.536, 1.952, 2.022\}$ を用いた平均の予測曲線は次のようになる.
+
+```{r fig.show="hold", out.width="50%", out.height="100%", fig.align="default"}
+xx <- seq(min(d$x), max(d$x), length = 50)
+ 
+# control
+plot.data(col = c("#000000", NA)[d$f])
+ff <- factor("C", levels = c("C", "T"))
+p <- predict(fit.xf, newdata = data.frame(x = xx, f = ff), type = "response")
+lines(xx, p * 8, lwd = 3, col = "gray")
+ 
+# treatment
+plot.data(col = c(NA, "#000000")[d$f])
+ff <- factor("T", levels = c("C", "T"))
+p <- predict(fit.xf, newdata = data.frame(x = xx, f = ff), type = "response")
+lines(xx, p * 8, lwd = 3, col = "black")
+```
+
+- 例題データからcontrolデータだけを選んで, fitさせた予測曲線と, 各 $x$ での二項分布の図示.
+
+```{r echo=FALSE, fig.show="hold", out.width="50%", out.height="100%", fig.align="default"}
+d0 <- d[d$f == "C", ]
+col.d <- "#00000040"
+range.x <- c(7, 12)
+range.y <- c(0, 8)
+ 
+plot.d0 <- function(type = "p") {
+    plot(
+        d0$x, d0$y,
+        xlim = range.x,
+        ylim = range.y,
+        type = type,
+        axes = FALSE
+    )
+    axis(1, pos = 0)
+    axis(2, pos = range.x[1])
+    abline(v = range.x[1])
+    abline(h = 0)
+}
+ 
+plot.d0(type = "p")
+ 
+plot.d0(type = "n")
+fit.c <- glm(cbind(y, N - y) ~ x, data = d0, family = binomial)
+draw.binom <- function(x) {
+    abline(v = x, col = col.d)
+    p <- predict(fit.c, newdata = data.frame(x = x), type = "response")
+    sd <- sd(fit.c$residuals)
+    for (yy in 0:8) rect(
+            x - dbinom(yy, 8, p) * 2,
+            yy - 0.4,
+            x,
+            yy + 0.4,
+            border = NA,
+            col = col.d
+        )
+    points(x, 8 * p, pch = 16)
+}
+draw.binom(x = 8.5)
+draw.binom(x = 10)
+draw.binom(x = 12)
+b <- fit.c$coefficients
+x <- seq(min(d0$x), max(d0$x), length = 100)
+lines(x, 8 * logistic(b[1] + b[2] * x), lty = 1, lwd = 2)
+```
+
+### ロジットリンク関数の意味・解釈
+
+ロジットリンク関数の $\log$ の中身をオッズ(odds)とよぶ.
+$$
+    {\rm logit}(q_{i}) = \log \frac{q_{i}}{1 - q_{i}} \\
+    \frac{q_{i}}{1 - q_{i}} = \exp(\beta_{1} + \beta_{2} x_{i} + \beta_{3} f_{i}) = \exp(\beta_{1}) \exp(\beta_{2} x_{i}) \exp(\beta_{3} f_{i})
+$$
+
+- この例題の場合だと, (生存する確率) / (生存しない確率) という比を表す
+    - c.f.) $q_{i} = 0.8$ なら, 「オッズ4倍」などという
+- オッズは $\exp$ (パラメータ $\times$ 要因) に比例する
+    - e.g.) 個体 $i$ の大きさが「1単位」増大すれば, 生存確率のオッズは, $\exp (\beta_{2} \times 1) = \exp(1.95) = 7$ 倍ほど増大する
+    - e.g.) 「肥料なし(control, $f_{i} = 0$)」に比べて, 「施肥処理あり(treatment, $f_{i} = 1$)」のオッズは, $\exp (\beta_{3} \times 1) = \exp(2.02) = 7.5$ 倍ほど増大する
+- => このように, ロジットリンク関数で生存確率を定義することで, さまざまな要因と応答事象のオッズの解釈が簡単になる(ロジスティック回帰のもう1つの利点)
+    - もともとの利点: 生存確率が $0 \leq q_{i} \leq 1$ となる
+    - c.f.) オッズ比で(発病のなどの)「リスク」を(近似的)に表すことができる
+        - e.g.) 個人の生活習慣 $X$ の効果を表す係数 $\beta_{s}$ をロジスティック回帰で推定 -> 病気になるオッズ比(リスク)は $\exp({\hat \beta_{s}})$ 倍
+
+### ロジスティック回帰のモデル選択
+
+ロジスティック回帰のネストしているモデルたちもAICでモデル選択できる.
+Rの`Mass`packageの`stepAIC`関数を使うと, ネストしているモデルのAICを自動的に比較しながら, AIC最小のモデルを選択できる.
+
+```{r}
+library(MASS)
+print(stepAIC(fit.xf))
+```
+
+`x + f`モデルがAICの観点から最良であることが確認できる.
+1つ1つ確認するコードは以下.
+
+```{r}
+fit.null <- glm(cbind(y, N - y) ~ 1, data = d, family = binomial)
+fit.f <- glm(cbind(y, N - y) ~ f, data = d, family = binomial)
+fit.x <- glm(cbind(y, N - y) ~ x, data = d, family = binomial)
+fit.xf <- glm(cbind(y, N - y) ~ x + f, data = d, family = binomial)
+ 
+k.null <- 1 * 2
+k.f <- 2 * 2
+k.x <- 2 * 2
+k.xf <- 2 * 3
+k.full <- 2 * 100
+d.null <- -2 * logLik(fit.null)
+d.f <- -2 * logLik(fit.f)
+d.x <- -2 * logLik(fit.x)
+d.xf <- -2 * logLik(fit.xf)
+d.full <- -2 * sum(dbinom(d$y, d$N, prob = d$y / d$N, log = TRUE))
+```
+```{r, comment="", echo=F, results="asis"}
+cat(
+    "model | 2k | deviance | residual deviance | AIC", "\n",
+    "--|--|--|--|--", "\n",
+    "null", "|", k.null, "|", d.null[1], "|", d.null[1] - d.full[1], "|", fit.null$aic, "\n",
+    "f", "|", k.f, "|", d.f[1], "|", d.f[1] - d.full[1], "|", fit.f$aic, "\n",
+    "x", "|", k.x, "|", d.x[1], "|", d.x[1] - d.full[1], "|", fit.x$aic, "\n",
+    "x + f", "|", k.xf, "|", d.xf[1], "|", d.xf[1] - d.full[1], "|", fit.xf$aic, "\n",
+    "full", "|", k.full, "|", d.full[1], "|", d.full[1] - d.full[1], "|", d.full[1] + k.full, "\n"
+)
+```
+
+
+
+# 交互作用項
+
+- **交互作用項(interaction)**: 線形予測子の項を掛け合わせ
+    - e.g.) この例題の場合, 体のサイズ $x_{i}$ と施肥処理の効果 $f_{i}$ の「積」の効果
+    - ${\rm logit} (q_{i}) = \beta_{1} + \beta_{2} x_{i} + \beta_{3} f_{i} + \beta_{4} x_{i} f_{i}$
+        - 因子型説明変数の $f_{i}$ を{0, 1}の2値とすれば, この交互作用項は単純に「 $x_{i}$ と $f_{i}$ の積に係数 $\beta_{4}$ の値をかけたもの」と考えられる
+        - -> 交互作用が大きな影響をもつ場合, 平均生存種子数の体サイズ $x_{i}$ 依存性は, 施肥処理 $f_{i}$ によって大きく変わる
+    - Rでは, `glm(cbind(y, N - y) ~ x * f, ...)`として指示する
+        - `x * f`: `x + f + x:f` の省略記法(`x:f`が交互作用を表す)
+
+```{r}
+fit.xfi <- glm(cbind(y, N - y) ~ x * f, data = d, family = binomial)
+print(fit.xfi)
+```
+
+一見すると, `x + f` モデルの係数 `fT` の推定値(2.02)と, `xfi` モデルの係数 `fT` の推定値(-0.06)が大きく異なるようにみえるが, 施肥処理をした場合のリンク関数(線形予測子)を考えると,
+
+$$
+    {\rm logit}(q_{i}) = -18.5 - 0.0638 + (1.85 + 0.216) = -18.6 + 2.07 x_{i}
+$$
+
+となり, かなり値は近くなる.
+また, 以下に図示するように, モデルの予測も大きく変わらない.
+
+```{r fig.show="hold", out.width="50%", out.height="100%", fig.align="default"}
+cols = c("#11b5c6", "#542ac1")
+ 
+plot.xf <- function(fit, main = NA) {
+    plot(d$x, d$y, type = "n", main = main, xlab = "x", ylab = "y")
+    xx <- seq(min(d$x), max(d$x), length = 50)
+    ff <- factor("C", levels = c("C", "T"))
+    q <- predict(fit, newdata = data.frame(x = xx, f = ff), type = "response")
+    lines(xx, q * 8, col = cols[1], lwd = 3)
+    ff <- factor("T", levels = c("C", "T"))
+    q <- predict(fit, newdata = data.frame(x = xx, f = ff), type = "response")
+    lines(xx, q * 8, col = cols[2], lwd = 3)
+}
+ 
+plot.xf(fit.xf, main = "without interaction")
+legend("topleft", legend = c("C", "T"), lwd = 3, col = cols)
+plot.xf(fit.xfi, main = "with interaction")
+legend("topleft", legend = c("C", "T"), lwd = 3, col = cols)
+```
+
+`stepAIC` を利用することもできる
+
+```{r}
+print(stepAIC(fit.xfi))
+```
+
+今回は, 交互作用項を入れると, AICは悪化してしまっている.
+
+- **交互作用項に関する注意点**
+    - 係数だけを見ても解釈できない場合が多い
+        - 実際の観測データに基づいて, 交互作用項が表す複雑なパターンを特定するのはなかなか難しい
+    - むやみに交互作用項を入れてしまうと, 説明変数が多い場合にはその個数が「組み合わせ論的爆発」で増大して, パラメータ推定が困難になる
+    - 交互作用項の効果の過大推定の可能性
+        - 現実のデータにGLMをあてはめた場合, 交互作用項を多数含んだモデルのAICが最良になる場合がある
+        - -> ニセの交互作用でつじつまあわせをしている可能性がある
+        - => 説明変数では説明できない「個体差」「場所差」の効果を組み込んだGLMを使う必要がある
+
+
+
+# オフセット項わざ
+
+- 観測データ同士の割算により生じる問題
+    - **情報が失われる**: e.g.) 1000打数300安打の打者 ≠ 10打数3安打の打者
+    - **変換された値の分布**: 分子・分母にそれぞれ誤差が入った数量同士を割算して作られた割算値の確率分布を導出するのは非常に難しい
+
+- ロジスティック回帰(二項分布&ロジットリンク関数)を使うもう1つの利点
+    - **何かの生起確率を推定するときに, (観測データ) / (観測データ)という割算を作り出さなくてもよい**
+        - 逆に言えば, 応答変数に割算や変数変換による数値を用いなくてもよい統計モデリングが**必ずある**
+    - => **オフセット項わざ**
+
+***
+Example data
+
+- 森林の100箇所の調査: 植物個体の「人口密度」と「明るさ」の影響を調べたい
+    - $A_{i}$ : 面積
+    - $x_{i}$ : 明るさ
+    - $y_{i}$ : 植物個体数
+
+```{r fig.show="hold", out.width="50%", out.height="100%", fig.align="default"}
+d <- read.csv("../data/data6b.csv")
+ 
+v.cex <- d$A * 0.2
+col.a <- function(x, o = 0.1) {
+    rgb(0, x, 0, (1 - x) * (1 - 2 * o) + o)
+}
+v.col <- col.a(d$x)
+plot.offset <- function(xx, xlab = NA)
+{
+	plot(
+		xx, d$y,
+		xlab = xlab, ylab = "y",
+		cex = v.cex, col = v.col, pch = 1,
+		xlim = c(0, max(xx) * 1.05),
+		ylim = c(0, max(d$y) * 1.05)
+	)
+}
+ 
+plot.offset(d$x, xlab = "x")
+plot.offset(d$A, xlab = "A")
+```
+
+明るい地点ほど明るく, 広い地点ほど大きくプロット
+
+***
+
+GLMのオフセット項を利用すれば, 人口密度という概念を扱うからといって, 割算値をこしらえる必要はない.
+
+$$
+    \frac{平均個体数\lambda_{i}}{A_{i}} = 人口密度 \\
+    \lambda_{i} = A_{i} \times 人口密度 = A_{i} \exp(\beta_{1} + \beta_{2} x_{i}) \\
+    \lambda_{i} = \exp(\beta_{1} + \beta_{2} x_{i} + \log A_{i})
+$$
+
+とモデル化することができて, $\exp(\beta_{1} + \beta_{2} x_{i} + \log A_{i})$ を線形予測子とすると対数リンク関数・ポアソン分布のGLMとなる.
+
+- **オフセット項**: この $\log A_{i}$ のような, 線形予測子の中でパラメータのつかない項
+    - 線形予測子に $\log A_{i}$ という「ゲタ」を履かせている
+
+Rでは以下のように, `glm(offset)` 引数を指定することで使用可能.
+
+
+```{r}
+fit <- glm(y ~ x, offset = log(A), data = d, family = poisson)
+print(fit)
+ 
+b <- fit$coefficients
+plot.offset(d$A)
+v.a <- c(0, 20)
+for (x in c(0.1, 0.3, 0.5, 0.7, 0.9)) {
+    lines(v.a, v.a * exp(b[1] + b[2] * x), col = col.a(x, o = 0), lwd = 3)
+}
+```
+
+上は, 明るさごとの平均個体数予測をプロットしたもの(明るい場所ほど明るい直線).
+
+- 「単位面積あたり」ではなく「単位時間あたり」の事象にも使える
+    - **観察時間の対数**をオフセット項に指定する
+- カウントデータだけではなく, (連続値) / (連続値) のような比率・密度にも使用可能
+
+
+
+# 正規分布とその尤度
+
+- **正規分布(normal distribution, ガウス分布(Gaussian distribution))**: **連続値**データを扱うための確率分布
+    - パラメータ
+        - 平均値 $\mu \in (-\infty, \infty)$
+        - 標準偏差 $\sigma$
+
+正規分布の**確率密度関数**は以下.
+$$
+    p(y | \mu, \sigma) = \frac{1}{\sqrt{2 \pi \sigma^2}} \exp \Biggl\{ - \frac{(y - \mu)^2}{2 \sigma^2} \Biggr\}
+$$
+(これまでのような離散確率分布の確率の分布は**確率質量関数**と呼ばれる)
+
+```{r}
+y <- seq(-5, 5, 0.1)
+plot(y, dnorm(y, mean = 0, sd = 1), type = "l")
+```
+
+- 連続値の確率分布では, 確率密度を積分した量が確率として定義される
+    - Rの `pnorm(x, mu, sd)` 関数は $\int_{-\infty}^{x}p(y | \mu, \sigma) dy$ を計算してくれる
+        - `pnorm(x2, mu, sd) - pnorm(x1, mu, sd)` で, $y$ が`x2`から`x1`までの値をとる確率を計算できる
+    - 他にも, 長方形の面積による近似計算などもある
+
+$p(1.2 \leq y \leq 1.8 | \mu, \sigma)$の評価例.
+
+```{r}
+# integration
+print(pnorm(1.8, 0, 1) - pnorm(1.2, 0, 1))
+# approximation
+print(dnorm(1.5, 0, 1) * (1.8 - 1.2))
+```
+
+
+## 正規分布の最尤推定
+
+確率 = 確率密度関数 $\times \Delta y$ という考えに基づく, 正規分布の尤度関数と対数尤度関数は以下.
+
+$$
+    L(\mu, \sigma) = \prod_{i}^N p(y_{i} | \mu, \sigma) \Delta y \\
+    L(\mu, \sigma) = \prod_{i}^N \frac{1}{\sqrt{2 \pi \sigma^2}} \exp \Biggl\{ - \frac{(y_{i} - \mu)^2}{2 \sigma^2} \Biggr\} \Delta y \\
+    \log L(\mu, \sigma) = - \frac{1}{2} N \log (2 \pi \sigma^2) - \frac{1}{2 \sigma^2} \sum_{i}^N (y_{i} - \mu)^2 + N \log(\Delta y)
+$$
+
+ここで, $\Delta y$ は定数なので, パラメータ $\{\mu, \sigma\}$ の最尤推定に影響を与えないため, 無視して省略できるため, 対数尤度関数は次のように書ける.
+
+
+$$
+    \log L(\mu, \sigma) = - \frac{1}{2} N \log (2 \pi \sigma^2) - \frac{1}{2 \sigma^2} \sum_{i}^N (y_{i} - \mu)^2
+$$
+
+- 尤度が確率密度の積である場合には, 対数尤度は負の値になるとは限らない
+    - e.g.) $\sigma^2$ が $0$ に近い場合
+    - -> AICや逸脱度が負の値になることもある
+- 正規分布の最尤推定と最小二乗法
+    - $\sigma$ が $\mu$ と無関係な定数だとすると, 二乗誤差の和 $\sum_{i} (y_{i} - \mu)^2$ を最小にするパラメータ ${\hat \mu}$ で対数尤度が最大になる 
+    - => 標準偏差 $\sigma$ が一定である正規分布の最尤推定 = 最小二乗法による推定
+    - 直線回帰 = 最小二乗法による直線のあてはめ
+        - 線形予測子: $z_{i} = \beta_{1} + \beta_{2} x_{i} $
+        - 恒等リンク関数: $\mu_{i} = z_{i}$
+
+
+
+# ガンマ分布のGLM
+
+- **ガンマ分布(gamma distribution)**: 確率変数の取りうる範囲が0以上の連続確率分布
+
+$$
+    p(y | s, r) = \frac{\Gamma(s)}{r^s} y^{s - 1} \exp(-ry)
+$$
+
+- パラメータ
+    - $s$: shapeパラメータ
+        - $\Gamma(s)$: ガンマ関数
+    - $r$: rateパラメータ
+        - $1/r$: scaleパラメータ
+    - $s = 1$のとき **指数分布(exponential distribution)** となる
+- Rの`dgamma(y, shape, rate)`関数を使うとガンマ分布の確率密度を評価できる
+
+```{r fig.show="hold", out.width="50%", out.height="100%", fig.align="default"}
+y <- seq(0, 5, 0.1)
+plot(y, dgamma(y, shape = 1, rate = 1), type = "l")
+plot(y, dgamma(y, shape = 5, rate = 5), type = "l")
+```
+
+***
+Example data
+
+
+- 架空植物50個体の葉の重量と花の重量の関係を調べる
+    - $x_{i}$ : 葉の重量
+    - $y_{i}$ : 花の重量
+
+```{r}
+d <- read.csv("../data/data6c.csv")
+plot(d$x, d$y, xlab = "x", ylab = "y")
+```
+
+$x_{i}$ が大きくなるにつれて $y_{i}$ も大きくなっているよう.
+
+***
+
+- 応答変数 $y_{i}$ は連続値だが, 重量なので正の値しか取らない
+    - 正規分布ではなく, ガンマ分布で説明した方がよい
+
+平均花重量 $\mu_{i}$ を以下のように定義すると, 対数リンク関数を用いたガンマ分布のGLMの線形予測子を導出できる.
+
+$$
+    \mu_{i} = A x_{i}^b \\
+    \mu_{i} = \exp(a) x_{i}^b = \exp(a + b \log x_{i})　\\
+    \log \mu_{i} = a + b \log x_{i}
+$$
+($A = \exp (a)$ とした.)
+
+以上から, 推定するべきパラメータは切片 $a$ と 傾き $b$.  
+例によってRの`glm`関数を用いて次のように推定できる.
+
+```{r}
+fit <- glm(y ~ log(x), family = Gamma(link = "log"), data = d)
+print(fit)
+ 
+plot(d$x, d$y, xlab = "x", ylab = "y")
+lines(d$x, predict(fit, newdata = data.frame(x = d$x), type = "response"), lwd = 3, col = "#390ea2")
+```
+
+以下は, より詳細なプロット.
+
+- 破線: 真の平均
+- 黒い曲線: `glm`による平均予測
+- グレーの曲線: 予測分布の中央値
+- より薄い領域: 50%予測区間(25 ~ 75%の区間)
+- さらに薄いグレーの領域: 90%予測区間(5 ~ 95%の区間)
+
+
+```{r, echo=FALSE, fig.show='hold'}
+x <- seq(0.001, 0.8, length = 50)
+get.y.mean <- function(b1, b2, x) exp(b1 + b2 * log(x))
+p <- list(b1 = -1, b2 = 0.7, inv.phi = 3) # phi: dispersion parameter
+y.mean <- get.y.mean(p[["b1"]], p[["b2"]], x)
+ 
+sum.fit <- summary(fit)
+vc <- sum.fit$coefficients[,"Estimate"]
+names(vc) <- c("b1", "b2")
+phi <- sum.fit$dispersion # dispersion parameter
+  
+get.y.mean <- function(b1, b2, x) exp(b1 + b2 * log(x))
+plot.d <- function(tline = TRUE)
+{
+	plot(d$x, d$y, xlab = "x", ylab = "y")
+	if (tline) {
+		lines(d$x, get.y.mean(p[["b1"]], p[["b2"]], d$x), lty = 2, lwd = 2)
+	}
+}
+ 
+plot.d()
+lines(d$x, predict(fit, newdata = data.frame(x = d$x), type = "response"), lwd = 2)  
+m <- get.y.mean(vc["b1"], vc["b2"], d$x)
+rate <- 1 / (phi * m)
+shape <- 1 / phi
+plot.pi <- function(q) polygon(
+	c(d$x, rev(d$x)),
+	c(qgamma(q, shape, rate), rev(qgamma(1 - q, shape, rate))),
+	border = NA,
+	col = "#00000020"
+)
+plot.pi(q = 0.05)
+plot.pi(q = 0.25)
+# median
+lines(d$x, qgamma(0.5, shape, rate), col = "#808080", lwd = 2)
+```

@@ -1,0 +1,353 @@
+---
+title: chapter3 ― 一般化線形モデル(GLM)
+subtitle: ポアソン回帰
+author: KADOWAKI, Shuhei
+date: 2018/11/27
+output:
+    html_document:
+        toc: true
+        toc_float: true
+        number_sections: true
+        theme: cosmo
+        code_folding: show
+        df_print: paged
+---
+
+```{r echo=FALSE}
+### Setting the global code chunk options ###
+# Args
+#   comment='': won't append any string to the start of each line of results
+#   fig.align='center': align figures to the center of document
+knitr::opts_chunk$set(comment="", fig.align="center")
+```
+
+
+
+# basic operations
+
+```{r}
+# load data as data.frame object
+d <- read.csv('../data/data3.csv')
+```
+
+```{r results='hold', rows.print=5, max.print=25}
+# only the first 25 rows gonna be rendered (5 rows per page)
+print(class(d))
+d
+```
+
+```{r, results='hold'}
+print(class(d$x))
+d$x
+```
+
+```{r, results='hold'}
+print(class(d$y))
+d$y
+```
+
+```{r, results='hold'}
+print(class(d$f))
+d$f
+```
+
+```{r}
+summary(d)
+```
+
+```{r, results='hold'}
+# scatter plot
+plot(d$x, d$y, pch = c(21, 19)[d$f])
+legend('topleft', legend = c('C', 'T'), pch = c(21, 19))
+```
+
+```{r, results='hold'}
+# box-whisker plot - factor variables on x label
+plot(d$f, d$y)
+```
+ハコの上中下の水平線はそれぞれ75%, 50%, 25%点, 上下のヒゲの範囲が近似的な95%区間, マルはその近似95%をはみ出したデータ点(outliers)を表す
+
+
+# Poisson regression
+
+種子数の平均$\lambda$を説明変数$x_{i}$(個体ごとの体サイズ)を用いて$\lambda_{i}$に拡張
+$$
+    p(y_{i}|\lambda_{i}) = \frac{\lambda_{i}^{y_{i}} \exp(-\lambda_{i})}{y_{i}!} \\
+    \lambda_{i} = \exp(\beta_{1} + \beta_{2}x_{i}) \\
+    \log \lambda_{i} = \beta_{1} + \beta_{2} x_{i}
+$$
+
+- $x_{i}$: 説明変数(explanatory variable, あるいは 共変量(covariate))
+- $\beta_{1}, \beta_{2}$: パラメーター(parameter あるいは 係数(coefficient))
+    - $\beta_{1}$: 切片(intercept)
+    - $\beta_{2}$: 傾き(slope)
+- $\beta_{1} + \beta_{2} x_{i}$: 線形予測子(linear predictor)
+    - 2乗以上の項が含まれても線形予測子(線形結合だから)
+- $\log \lambda_{i}$: 対数リンク関数(log link function)
+    - $\lambda_{i}$の関数を「リンク関数」と呼び, 対数リンク関数以外にもロジットリンク関数などもある
+    - GLMにはそれぞれの確率分布ごとに都合がよいリンク関数があり, 正準リンク関数と呼ばれる
+
+- GLM with Possion regressionで対数リンク関数を使う理由
+    - $\exp(線形予測子) \geq 0$となる: ポアソン分布の平均は非負である必要がある
+    - 要因の効果が積で表されるから
+
+以上から, このポアソン回帰(観測データに対するポアソン分布と使った統計モデルのfitting)モデルの対数尤度(パラメータ$\beta_{1}, \beta_{2}$の関数)は次のよう.
+$$
+    \log L(\beta_{1}, \beta_{2}) = \sum_{i} \log\frac{\lambda_{i}^{y_{i}} \exp(-\lambda_{i})}{y_{i}!}
+$$
+
+
+## fitting
+
+この場合の最尤推定量の導出は簡単ではないが, 数値的な試行錯誤によって導かれるので, Rに任せておいてok
+
+```{r}
+fit <- glm(formula = y ~ x, data = d, family = poisson(link = log))
+fit
+summary(fit)
+```
+
+- `(Intercept)`: 切片$\beta_{1}$
+- `x`: 傾き$\beta_{2}$
+- `Estimate`: 最尤推定値
+- `Std.Error`: 標準誤差の**推定値**
+    - 「真のモデル」は知らないのであくまで「推定」した値
+    - 推定のばらつきが正規分布であると仮定し, さらに対数尤度関数(最尤推定値で最大になる凸関数)は最大値付近でのカタチがその正規分布に近いと仮定することで得ている(ある種の近似)
+- `z value`: z値(最尤推定値をSEで除した値)
+    - 最尤推定値がゼロから十分に離れているかの目安
+    - Wald統計量(Wald statistics)とも呼ばれる
+- `Pr(>|z|)`: 平均=(z値の絶対値), 標準偏差1の正規分布がマイナス無限大からゼロまでの値を取る確率の2倍
+    - 大きいほどz値がゼロに近い(=最尤推定値がゼロに近い)
+
+モデルの最大対数尤度は`logLik`関数を用いて調べることができる
+`df`は自由度(degrees of freedom)=最尤推定したパラメーターの数を表す
+
+```{r}
+logLik(fit)
+```
+
+
+## prediction
+
+推定結果$\lambda = \exp(1.29 + 0.0757x)$を用いる
+
+```{r, fig.show='hold'}
+xx <- seq(min(d$x), max(d$x), length = 100)
+plot(d$x, d$y, pch = c(21, 19)[d$f])
+lines(xx, exp(1.29 + 0.0757 * xx), lwd = 2)
+```
+
+`predict`関数を使えばお手軽
+```{r, fig.show='hold'}
+yy <- predict(fit, newdata = data.frame(x = xx), type = 'response')
+plot(d$x, d$y, pch = c(21, 19)[d$f])
+lines(xx, yy, lwd = 2)
+```
+
+
+# advanced explanatory variables
+
+
+## factor variable
+
+ダミー変数$d_{i}$を用いて, 次のようなリンク関数を考えることができる
+$$
+    \lambda_{i} = \exp(\beta_{1} + \beta_{2}d_{i}) \\
+    d_{i} = \left\{
+                \begin{array}{ll}
+                    1 & (f_{i} = C) \\
+                    0 & (f_{i} = T)
+                \end{array}
+            \right.
+$$
+
+```{r}
+fit.f <- glm(y ~ f, data = d, family = poisson)
+fit.f
+logLik(fit.f)
+```
+
+- `fT`: $\beta_{2}$に対応
+    - 「肥料をやると平均種子数がほんの少しだけ増える」
+
+2水準以上の因子型説明変数については, Rのデフォルトでは(水準数 - 1)のダミー変数を用意する
+
+
+## numerical variable + factor variable
+
+対数リンク関数は次のよう.
+$$
+    \log \lambda_{i} = \beta_{1} + \beta_{2}x_{i} + \beta_{3}d_{i}
+$$
+
+```{r}
+fit.all <- glm(y ~ x + f, data = d, family = poisson)
+fit.all
+logLik(fit.all)
+```
+肥料の効果はマイナスに推定されてしまった
+
+
+# interpretability of  log link function - factorial effect
+
+`fit.all`のリンク関数は次のように分解できる.
+$$
+    \lambda_{i} = (定数) \times (サイズの効果) \times (肥料の効果)
+$$
+よって平均$\lambda_{i}$はサイズ・肥料の効果の積になる.
+e.g.) 「サイズ$x_{i}$が1増加すると, 平均$\lambda_{i}$は$\exp(0.08\times1)=1.08$倍に増える
+
+一方恒等リンク関数(平均が線形予測子に等しい, つまりリンク関数がとくに何もない状態)では,
+$$
+    \lambda_{i} = (定数) + (サイズの効果) + (肥料の効果)
+$$
+となり, 対数リンク関数の考え方とは全く違うものになる.
+これは, 一般化ではない線形モデル(linear model, LM)あるいは一般線形モデル(*general* linear model)と呼ばれる
+
+以下は対数リンク関数と, 恒等リンク関数(`fit.id`に格納)の比較.
+
+```{r fig.show="hold", out.width="50%", out.height="100%", fig.align="default"}
+x.min <- 5
+x.max <- 20
+xx <- seq(x.min, x.max, length = 50)
+y <- function(x) exp(fit.all$coefficients[1] + fit.all$coefficients[2] * x)
+ 
+plot.link <- function(file, yyC, yyT)
+{
+	plot(
+		numeric(0), numeric(0), type = "n",
+		xlim = c(x.min, x.max),
+		ylim = c(y(x.min) * 0.7, y(x.max) * 1.05),
+		xlab = "size x_{i}", ylab = "mean of seeds lambda_{i}"
+	)
+	lines(xx, yyC, lwd = 2, col = "#000000")
+	lines(xx, yyT, lwd = 2, col = "#808080")
+}
+ 
+coef <- fit.all$coefficients
+plot.link(
+	"linkLog",
+	exp(coef[1] + coef[2] * xx),
+	exp(coef[1] + coef[2] * xx + coef[3] * 3)
+)
+ 
+fit.id <- glm(y ~ x + f, data = d, family = poisson(link = "identity"))
+coef <- fit.id$coefficients
+plot.link(
+	"linkIdentity",
+	(coef[1] + coef[2] * xx),
+	(coef[1] + coef[2] * xx + coef[3] * 3)
+)
+```
+
+
+## LM in GLM
+
+LMでよく使われるあてはめの1つである直線回帰(linear regression)をGLMのスキーマの中で理解すると以下のよう.
+
+- 観測値$X$(説明変数)と$Y$(応答変数)のペアがある
+- $Y$は平均$\mu_{i}$, 標準偏差$\sigma$の正規分布に従う
+- あるデータ点$i$において平均値が$\mu_{i}=\beta_{1} + \beta_{2}x_{i}$となる
+
+例としてLMとGLMのモデルと確率分布の関係を図示する.
+新たな架空データに対してLMとGLMを当てはめる.
+上が正規分布&恒等リンク関数のGLM(つまりLM), 下がポアソン分布&対数リンク関数のGLM.
+
+```{r, results='hold'}
+N <- 30
+x <- seq(0, 2, length = N)
+m <- function(xx) exp(-4 + 3 * xx)
+d0 <- data.frame(
+	x = x,
+	y = rpois(N, lambda = m(x))
+)
+ 
+width  <- 3.0 # inch
+height <- 2.1 # inch
+col.d <- "#aaaaaa"
+ 
+range.y <- c(-1.9, 7)
+plot.d0 <- function()
+{
+	par(mar = c(1.5, 1.5, 0.1, 0.1), mgp = c(1.5, 0.5, 0), cex = 1.0)
+	plot(
+		d0$x, d0$y,
+		type = "n",
+		ylim = range.y,
+		xlab = "x",
+		ylab = "y",
+		axes = FALSE
+	)
+	lines(c(0, 2), c(0, 0))
+	axis(1, at = seq(0.5, 2.0, 0.5), pos = 0)
+	axis(2, pos = 0)
+	abline(v = 0)
+}
+add.points <- function()
+{
+	points(d0$x, d0$y)
+}
+```
+
+```{r}
+# lm
+plot.d0()
+fit.lm <- glm(y ~ x, data = d0, family = gaussian)
+draw.norm <- function(x)
+{
+	abline(v = x, col = col.d)
+	m <- predict(fit.lm, newdata = data.frame(x = x), type = "response")
+	sd <- sd(fit.lm$residuals)
+	yy <- seq(range.y[1] - 3, range.y[2] + 3, length = 100)
+	polygon(
+		x - dnorm(yy, m, sd) * 0.5,
+		yy,
+		border = NA,
+		col = col.d
+	)
+}
+draw.norm(x = 0.5)
+draw.norm(x = 1.1)
+draw.norm(x = 1.7)
+abline(fit.lm, lty = 2, lwd = 2)
+add.points()
+```
+
+```{r}
+# glm with Possion distribution
+plot.d0()
+fit.glm <- glm(y ~ x, data = d0, family = poisson)
+draw.pois <- function(x)
+{
+	abline(v = x, col = col.d)
+	lambda <- predict(fit.glm, newdata = data.frame(x = x), type = "response")
+	sd <- sd(fit.glm$residuals)
+	for (yy in 0:10) rect(
+		x - dpois(yy, lambda) * 0.5,
+		yy - 0.3,
+		x,
+		yy + 0.3,
+		border = NA,
+		col = col.d
+	)
+}
+draw.pois(x = 0.5)
+draw.pois(x = 1.1)
+draw.pois(x = 1.7)
+b <- fit.glm$coefficients
+lines(x, exp(b[1] + b[2] * x), lty = 2, lwd = 2)
+add.points()
+```
+
+図からわかるように, 常に直線回帰で片付けようとするのは非常に危険.
+上図の場合だと, 直線回帰は次のような問題点がある.
+
+- 正規分布は連続的な値を扱うハズでは??
+- カウントデータなのに, 平均値の予測がマイナスになる??
+- 「ばらつき一定」ではないのに, **分散一定**を仮定する??
+
+一方でこの場合だとポアソン分布を用いることで上記3点をつぎのように解決できる.
+
+- ポアソン分布を使っているのでカウントデータに正しく対応
+- 対数リンク関数を使えば平均値は常に非負
+- $y$のばらつきは平均とともに増大する

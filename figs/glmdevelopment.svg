@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="600"
+   height="330"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.47 r22583"
+   version="1.0"
+   sodipodi:docname="glmdevelopment.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <defs
+     id="defs4">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 180 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="600 : 180 : 1"
+       inkscape:persp3d-origin="300 : 120 : 1"
+       id="perspective81" />
+    <marker
+       inkscape:stockid="Arrow2Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Mend"
+       style="overflow:visible">
+      <path
+         id="path8289"
+         style="font-size:12px;fill-rule:evenodd;stroke-width:0.625;stroke-linejoin:round"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         transform="scale(-0.6,-0.6)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mstart"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Mstart"
+       style="overflow:visible">
+      <path
+         id="path8310"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="matrix(0.4,0,0,0.4,4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Lend"
+       style="overflow:visible">
+      <path
+         id="path8313"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="matrix(-0.8,0,0,-0.8,-10,0)" />
+    </marker>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     gridtolerance="10000"
+     guidetolerance="10"
+     objecttolerance="10"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.3666667"
+     inkscape:cx="300"
+     inkscape:cy="165"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer2"
+     width="600px"
+     height="360px"
+     inkscape:window-width="1016"
+     inkscape:window-height="716"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     showgrid="false"
+     inkscape:window-maximized="0" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="fig"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-30)">
+    <path
+       sodipodi:type="arc"
+       style="fill:#000000;fill-opacity:0.0627451;fill-rule:evenodd;stroke:#808080;stroke-width:0.49489829;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="path1890"
+       sodipodi:cx="550.29547"
+       sodipodi:cy="454.83551"
+       sodipodi:rx="293.24133"
+       sodipodi:ry="224.61038"
+       d="m 843.5368,454.83551 c 0,124.04889 -131.28861,224.61038 -293.24133,224.61038 -161.95272,0 -293.24133,-100.56149 -293.24133,-224.61038 0,-124.04889 131.28861,-224.61038 293.24133,-224.61038 161.95272,0 293.24133,100.56149 293.24133,224.61038 z"
+       transform="matrix(0.778724,0,0,0.838889,-12.05772,-89.67415)" />
+    <path
+       transform="matrix(0.387234,0,0,0.25,300.7082,223.0955)"
+       d="m 843.5368,454.83551 c 0,124.04889 -131.28861,224.61038 -293.24133,224.61038 -161.95272,0 -293.24133,-100.56149 -293.24133,-224.61038 0,-124.04889 131.28861,-224.61038 293.24133,-224.61038 161.95272,0 293.24133,100.56149 293.24133,224.61038 z"
+       sodipodi:ry="224.61038"
+       sodipodi:rx="293.24133"
+       sodipodi:cy="454.83551"
+       sodipodi:cx="550.29547"
+       id="path2778"
+       style="fill:#000000;fill-opacity:0.0627451;fill-rule:evenodd;stroke:#808080;stroke-width:1.2855922;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       sodipodi:type="arc" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="words"
+     transform="translate(0,-30)">
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:IPAGothic"
+       x="12.7425"
+       y="90.34272"
+       id="text1872"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan1874"
+         x="12.7425"
+         y="90.34272"
+         style="font-size:28px;fill:#000000;fill-opacity:1">階層ベイズモデル</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:IPAGothic"
+       x="150.86015"
+       y="177.73027"
+       id="text1876"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan1878"
+         x="150.86015"
+         y="177.73027"
+         style="font-size:28px;fill:#000000;fill-opacity:1">一般化線形混合モデル</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:IPAGothic"
+       x="294.86014"
+       y="265.27179"
+       id="text1880"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan1882"
+         x="294.86014"
+         y="265.27179">一般化線形モデル</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:IPAGothic"
+       x="445.97781"
+       y="352.81332"
+       id="text1884"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan1886"
+         x="445.97781"
+         y="352.81332">線形モデル</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text2780"
+       y="47.860596"
+       x="236.87633"
+       style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#808080;fill-opacity:1;stroke:none;font-family:'IPAゴシック';-inkscape-font-specification:'IPAゴシック'"
+       xml:space="preserve"><tspan
+         style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#808080;fill-opacity:1;font-family:'IPAゴシック';-inkscape-font-specification:'IPAゴシック'"
+         y="47.860596"
+         x="236.87633"
+         id="tspan2782"
+         sodipodi:role="line">線形モデルの発展</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:'IPA Pゴシック';-inkscape-font-specification:'IPA Pゴシック'"
+       x="507.14615"
+       y="310.46036"
+       id="text4554"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4556"
+         x="507.14615"
+         y="310.46036"
+         style="font-size:14px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;font-family:'IPA Pゴシック';-inkscape-font-specification:'IPA Pゴシック'">最小二乗法</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:'IPA Pゴシック';-inkscape-font-specification:'IPA Pゴシック'"
+       x="507.14615"
+       y="204.75043"
+       id="text5467"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan5469"
+         x="507.14615"
+         y="204.75043"
+         style="font-size:14px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;font-family:'IPA Pゴシック';-inkscape-font-specification:'IPA Pゴシック'">最尤推定法</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:'IPA モナー Pゴシック';-inkscape-font-specification:'IPA モナー Pゴシック'"
+       x="402.33154"
+       y="90.705894"
+       id="text5471"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan5473"
+         x="402.33154"
+         y="90.705894"
+         style="font-size:14px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;font-family:'IPA モナー Pゴシック';-inkscape-font-specification:'IPA モナー Pゴシック'">MCMCによる事後分布の推定</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text6360"
+       y="64.691605"
+       x="481.7131"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#808080;fill-opacity:1;stroke:none;font-family:IPAGothic"
+       xml:space="preserve"><tspan
+         style="font-size:16px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#808080;fill-opacity:1;font-family:IPAGothic"
+         y="64.691605"
+         x="481.7131"
+         id="tspan6362"
+         sodipodi:role="line">推定計算方法</tspan></text>
+    <g
+       id="g12837"
+       style="fill:none;stroke:#808080;stroke-opacity:1"
+       transform="translate(0,6)">
+      <path
+         sodipodi:nodetypes="cc"
+         style="fill:none;stroke:#808080;stroke-width:4;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         d="m 442.95615,337.43387 c -53.33138,-0.88235 -50.26266,-66.48086 -50.26266,-66.48086"
+         id="path12793" />
+      <g
+         style="fill:none;stroke:#808080;stroke-width:1;stroke-opacity:1"
+         id="g12795"
+         transform="matrix(0.999963,-0.00868761,0.00868761,0.999963,206.3537,87.55946)">
+        <path
+           id="path12797"
+           d="m 184.78826,182.90264 -18.13114,20.81723"
+           style="fill:none;stroke:#808080;stroke-width:4;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+        <path
+           style="fill:none;stroke:#808080;stroke-width:4;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+           d="M 185.40986,182.81662 203.541,203.63385"
+           id="path12799" />
+      </g>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:IPAGothic"
+       x="277.94119"
+       y="315.76471"
+       id="text12811"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan12813"
+         x="277.94119"
+         y="315.76471">正規分布以外の</tspan><tspan
+         sodipodi:role="line"
+         x="277.94119"
+         y="335.76471"
+         id="tspan12815">確率分布をあつ</tspan><tspan
+         sodipodi:role="line"
+         x="277.94119"
+         y="355.76471"
+         id="tspan12817">かいたい</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:IPAGothic"
+       x="117.35294"
+       y="228.35294"
+       id="text12819"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan12821"
+         x="117.35294"
+         y="228.35294">個体差・場所差</tspan><tspan
+         sodipodi:role="line"
+         x="117.35294"
+         y="248.35294"
+         id="tspan12823">といったランダム</tspan><tspan
+         sodipodi:role="line"
+         x="117.35294"
+         y="268.35294"
+         id="tspan12825">効果をあつかいたい</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:IPAGothic"
+       x="3.5294154"
+       y="142.11765"
+       id="text12827"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan12829"
+         x="3.5294154"
+         y="142.11765">もっと自由で</tspan><tspan
+         sodipodi:role="line"
+         x="3.5294154"
+         y="162.11765"
+         id="tspan2866">現実的な</tspan><tspan
+         sodipodi:role="line"
+         x="3.5294154"
+         y="182.11765"
+         id="tspan12863">統計モデリングを!</tspan></text>
+    <g
+       id="g12843"
+       transform="translate(-153.5294,-83.11765)"
+       style="fill:none;stroke:#808080;stroke-opacity:1">
+      <path
+         id="path12845"
+         d="m 442.95615,337.43387 c -53.33138,-0.88235 -50.26266,-66.48086 -50.26266,-66.48086"
+         style="fill:none;stroke:#808080;stroke-width:4;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         sodipodi:nodetypes="cc" />
+      <g
+         transform="matrix(0.999963,-0.00868761,0.00868761,0.999963,206.3537,87.55946)"
+         id="g12847"
+         style="fill:none;stroke:#808080;stroke-width:1;stroke-opacity:1">
+        <path
+           style="fill:none;stroke:#808080;stroke-width:4;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+           d="m 184.78826,182.90264 -18.13114,20.81723"
+           id="path12849" />
+        <path
+           id="path12851"
+           d="M 185.40986,182.81662 203.541,203.63385"
+           style="fill:none;stroke:#808080;stroke-width:4;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      </g>
+    </g>
+    <g
+       transform="translate(-295.5882,-170.4706)"
+       id="g12853"
+       style="fill:none;stroke:#808080;stroke-opacity:1">
+      <path
+         sodipodi:nodetypes="cc"
+         style="fill:none;stroke:#808080;stroke-width:4;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         d="m 442.95615,337.43387 c -53.33138,-0.88235 -50.26266,-66.48086 -50.26266,-66.48086"
+         id="path12855" />
+      <g
+         style="fill:none;stroke:#808080;stroke-width:1;stroke-opacity:1"
+         id="g12857"
+         transform="matrix(0.999963,-0.00868761,0.00868761,0.999963,206.3537,87.55946)">
+        <path
+           id="path12859"
+           d="m 184.78826,182.90264 -18.13114,20.81723"
+           style="fill:none;stroke:#808080;stroke-width:4;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+        <path
+           style="fill:none;stroke:#808080;stroke-width:4;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+           d="M 185.40986,182.81662 203.541,203.63385"
+           id="path12861" />
+      </g>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,134 @@
+---
+title: chapter4 ― GLMのモデル選択
+subtitle: AICとモデルの予測の良さ
+author: KADOWAKI, Shuhei
+date: 2018/12/01
+output:
+    html_document:
+        toc: true
+        toc_float: true
+        number_sections: true
+        theme: cosmo
+        code_folding: show
+        df_print: paged
+---
+
+# then, how to select model ?
+
+- 対数尤度は**いま手元にある観測データへの**あてはまりの良さでしかない
+    - 最大対数尤度とは, 推定された統計モデルが真の統計モデルに似ているかどうかではなく, たまたま得られた観測データへのあてはまりの良さを表す
+
+- **AIC**によるモデル選択(model selection)
+    - AIC: 「あてはまりの良さ(goodness of fit)」ではなく「予測の良さ(goodness of prediction)」を重視するモデル選択基準
+
+
+# deviance
+
+- 逸脱度(deviance): 「あてはまりの悪さ」を表す.
+    - 最大対数尤度を$\log L^{*}$とすると, $-2 \log L^*$ で表される.
+- いろいろな逸脱度
+    - 残差逸脱度(residual deviance): 「あてはまりの悪さ」の**相対値**
+        - $(残差逸脱度) = D - (最小逸脱度)$
+        - 最小逸脱度: フルモデルの逸脱度
+        - フルモデル(full model): その統計モデルで最も複雑なモデル
+            - データ数と同じ数だけのパラメータを使ってあてはめた統計モデル
+            - 全データの「読み上げ」に相当する
+    - Null逸脱度(null deviance): 残差逸脱度の**最大値**
+        - $(Null逸脱度) = (最大逸脱度) - (最小逸脱度)$
+        - 最大逸脱度: Nullモデルの逸脱度
+        - Nullモデル(null model): 「もっともあてはまりの悪い」モデル
+            - 最もパラメータ数の少ないモデル(切片だけ)
+            - Rでは`glm(y ~ 1)`で指定可能
+    - パラメータ数$k$を増やせば増やすほど残差逸脱度は小さくなる
+
+
+```{r, comment=''}
+# deviance
+d <- read.csv("../data/data3.csv")
+fit <- glm(y ~ x, family = poisson, data = d)
+dev <- -2 * logLik(fit)
+dev[1]
+```
+
+```{r, results='hold', comment=''}
+# residual deviance
+dev.min <- -2 * sum(log(dpois(d$y, lambda = d$y)))
+print(dev.min)
+dev.res <- dev - dev.min
+print(dev.res[1])
+```
+
+```{r, results='hold', comment=''}
+# null deviance
+fit.null <- glm(y ~ 1, family = poisson, data = d)
+print(fit.null)
+dev.null = -2 * logLik(fit.null) - dev.min
+print(dev.null[1])
+```
+
+```{r, comment=''}
+# summary
+fit
+```
+
+
+# AIC
+
+最尤推定したパラメータの個数を$k$としたときのAICは次の式で表される
+$$
+    -2(\log L^{*} - k) = D + 2k
+$$
+このAICが**最も小さいモデル**が良いモデルとなる
+
+```{r, results='hold', comment=''}
+fit.f <- glm(y ~ f, family = poisson, data = d)
+fit.x <- glm(y ~ x, family = poisson, data = d)
+fit.xf <- glm(y ~ x + f, family = poisson, data = d)
+k.null <- 1 * 2
+k.f <- 2 * 2
+k.x <- 2 * 2
+k.xf <- 2 * 3
+k.full <- 2 * 100
+d.null <- -2 * logLik(fit.null)
+d.f <- -2 * logLik(fit.f)
+d.x <- -2 * logLik(fit.x)
+d.xf <- -2 * logLik(fit.xf)
+d.full <- dev.min # dev.min <- -2 * sum(log(dpois(d$y, lambda = d$y)))
+```
+```{r, comment='', echo=F, results='asis'}
+cat(
+    'model | 2k | D | AIC', '\n',
+    '--|--|--|--', '\n',
+    'null', '|', k.null, '|', d.null[1], '|', fit.null$aic, '\n',
+    'f', '|', k.f, '|', d.f[1], '|', fit.f$aic, '\n',
+    'x', '|', k.x, '|', d.x[1], '|', fit.x$aic, '\n',
+    'xf', '|', k.xf, '|', d.xf[1], '|', fit.xf$aic, '\n',
+    'full', '|', k.full, '|', d.full[1], '|', d.full[1] + k.full, '\n'
+)
+```
+
+## why AIC can choose a model ?
+
+- **平均対数尤度**(mean log likelihood): 統計モデルの予測の良さをあらわす量
+    1. 手元のデータに対してあるモデルのパラメータを推定する
+    2. 「真のモデル」から(同じデータ取得法で)サンプリングを繰り替えして, そのそれぞれの評価済みデータセットに対して対数尤度を評価する
+    3. その平均が平均対数尤度: $E(\log L)$
+- **バイアス**(bias): $b = \log L^* - E(\log L)$
+    - ある統計モデルの$(最大対数尤度) - (平均対数尤度)$
+- **バイアス補正**(bias correction)
+    - 平均対数尤度のstep.2は「実際には不可能」
+    -  $b$の定義を変更して, $E(\log L) = \log L^* - b$とすることで, 平均対数尤度$E(\log L)$の推定をする
+        - (-> これ以外には交差検証法(cross-validation)などの方法もある)
+    - **平均対数尤度の推定量が$\log L^* - k$であることがであることが解析的かつ一般的に導出されている**
+        - $E(\log L)^* = \log L^* - k$
+- **AIC: $-2\times E(\log L)^* = -2(\log L^* - k)$**
+    - 平均対数尤度は「統計モデルの予測の良さをあらわす量」であるから, AICは「統計モデルの予測の悪さをあらわす量」として解釈できる
+    - -> モデル選択とは「予測の悪さが小さいモデルを選ぶ」こと
+
+
+## AIC between nested GLMs
+
+- AICは平均対数尤度の推定量であり, それは$b$=(平均対数尤度と最大対数尤度のズレ)が*平均的に*パラメータ数$k$と同じであるという導出に基づいている
+- $b$のバラつき(*分散*)は??:=> (同一データに対する)モデルがネストしていれば$b$の分散は小さくなる
+    - (2つ以上のモデルが)**ネストにある**(nested): 一方のモデルに他方が含まれていること
+        - e.g.) `fit.x`モデルの傾きを0とすれば`fit.null`モデルになるので, これらはネストしている

@@ -1,0 +1,142 @@
+---
+title: chapter2 ― 確率分布と統計モデルの最尤推定
+author: KADOWAKI, Shuhei
+date: 2018/11/26
+output:
+    html_document:
+        toc: true
+        toc_float: true
+        number_sections: true
+        theme: cosmo
+        code_folding: show
+        df_print: paged
+---
+
+```{r echo=FALSE}
+### Setting the global code chunk options ###
+# Args
+#   comment='': won't append any string to the start of each line of results
+#   fig.align='center': align figures to the center of document
+knitr::opts_chunk$set(comment="", fig.align="center")
+```
+
+```{r}
+print('hello R world and statistical modeling !')
+```
+
+
+# basic operations
+
+```{r}
+load('../data/data2.RData')
+print(data)
+print(length(data))
+print(summary(data))
+print(table(data))
+hist(data, breaks = seq(-0.5, 9.5, 1))
+var(data)
+mean(data)
+sd(data)
+sqrt(var(data))
+```
+
+
+## probability distribution
+
+確率分布: **確率変数**(random variable)の値とそれが出現する確率を対応させたもの
+
+とりあえずポアソン分布(Poisson distribution)なるものを見てみる
+
+$$
+    p(y|\lambda) = \frac{\lambda^y \exp(-\lambda)}{y!}
+$$
+$p(y|\lambda)$: 平均が$\lambda$であるときに, ポアソン分布に従う確率変数が$y$という値になる確率
+$\lambda$: ポアソン分布唯一のパラメータ
+
+- ポアソン分布の性質
+    - 全ての和は1: $\sum_{y=0}^{\infty} p(y|\lambda) = 1$
+    - (分散)=(平均)=$\lambda$
+
+- ポアソン分布を選ぶ理由
+    - データがカウントデータ(非負の整数)
+    - $y$に下限(0)はあるが, 上限はわからない
+    - 観測データの平均と分散がだいたい等しい
+
+```{r, results='hold'}
+y <- 0:9
+prob <- dpois(y, lambda = 3.56)
+print(prob)
+plot(y, prob, type = 'b', lty = 2)
+```
+
+重ねて描写してみる
+
+```{r, results='hold'}
+hist(data, breaks = seq(-0.5, 9.5, 1))
+lines(y, length(data) * prob, type = 'b', lty = 2)
+```
+
+
+# maximum likelihood estimation
+
+- 最尤推定: 尤度(=「あてはまりの良さ」)を最大にするようなパラメータ推定方法
+    - 尤度: パラメータ$\theta$を決めた時の$p(y|\theta)$の積
+        - なぜ積なのか?: 「$y_{1}=2$」,...といったすべての事象が同時に真である確率を計算したいから
+    - $p(y|\theta)$が最大になる$\theta$を探す
+    - $ \prod_{i} p(y_{i}|\lambda) = \prod_{i} \frac{\lambda^{y_i} \exp(-\lambda)}{y_{i}!} $
+
+- 対数変換を施した対数尤度関数(log likelihood function)を使って最尤推定する
+    - 尤度$L$の単調増加関数
+    - $\log L(\lambda) = \sum_{i} (y_{i}\log \lambda - \lambda - \sum_{k}^{y_{i}} \log k)$
+
+- 今回のような簡単な対数尤度関数ならそれを最大にする$\lambda$を解析的に求めることができる
+    - $\log L(\lambda)$を$\lambda$で偏微分 => 傾きがゼロになる$\lambda$を求める
+    - $\hat{\lambda} = \frac{\sum_{i} y_{i}}{データ数}$
+
+- 最尤推定量($\hat{\lambda}$): 対数尤度あるいは尤度が最大になる$\lambda$
+- 最尤推定値($\hat{\lambda} = 3.56$など): 具体的な最尤推定量
+
+対数尤度と$\log L(\lambda)$と$\lambda$の関係を図示する
+
+```{r}
+logL <- function(m) sum(dpois(data, m, log = TRUE))
+lambda <- seq(2, 5, 0.1)
+plot(lambda, sapply(lambda, logL), type = 'l')
+```
+
+
+# standard error
+
+- 標準誤差: 推定値の不確かさを表す量
+    - 最尤推定値のばらつき
+    - 「真のモデル」を知らないと使えない
+        - ふつうは知らない => たまたま得られた観測データから推定されただけの値を用いて行う(意味あるの?)
+
+
+# sampling, estimation, prediction
+
+- 統計モデリングの流れ
+    1. データ(標本)を発生(**sampling**)させた確率分布(「真の統計モデル」)を考える
+    2. パラメータを**推定**する(**estimation**, あるいは「**あてはめ**」(**fitting**))
+    3. 同じsampling方法で得られる次のデータの分布を見積もる(**予測**, **prediction**)
+
+- predictionの種類
+    - 次に得られる応答変数の平均だけを示す
+        - 「回帰直線を引く」なども含まれる
+    - 次に得られるデータはこの範囲に散らばるはずだという予測区間も示す
+    - 将来予測(時系列構造データ), 欠損予測(空間構造データ)
+
+
+# probability distribution (again)
+
+- まず「この現象がどのような確率分布で説明されそうか」を考える
+- 次の点に注意
+    - 離散 or 連続
+    - 範囲
+    - 標本分散と標本平均の関係
+
+- examples
+    - ポアソン分布(Poisson distribution): 離散, 0以上上限なし, 平均≈分散
+    - 二項分布(binomial distiribution): 離散, 0以上有限, 分散は平均の関数
+    - 正規分布(normal distribution): 連続, 無限小から無限大, 分散は平均と無関係
+    - ガンマ分布(gamma distribution): 連続, 0から無限大, 分散は平均の関数
