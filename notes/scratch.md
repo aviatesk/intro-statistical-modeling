@@ -6,7 +6,6 @@ export_on_save:
     html: true
 ---
 
-# scratch - overview
 
 Just scratch to play with PCA, t-SNE and k-Means, using handwritten digits data
 
@@ -66,7 +65,7 @@ plt.show()
 ```
 
 
-Wall time: 1.31 s
+Wall time: 2.84 s
 ![](figures/scratch_figure3_1.png)
 
 
@@ -91,7 +90,7 @@ plt.show()
 ```
 
 
-Wall time: 1min 14s
+Wall time: 1min 12s
 ![](figures/scratch_figure4_1.png)
 
 
@@ -131,7 +130,7 @@ plt.show()
 ```
 
 
-Wall time: 22 s
+Wall time: 23.6 s
 ![](figures/scratch_figure5_1.png)
 
 
